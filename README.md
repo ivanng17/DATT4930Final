@@ -1,6 +1,9 @@
-up and down arrows for hue \n
-left and right arrows for blur \n
-shift and ctrl for distance \n
+up and down arrows for hue 
 
-q and w to add and delete boids \n
+left and right arrows for blur 
+
+shift and ctrl for distance 
+
+q and w to add and delete boids 
+
 s to screenshot
