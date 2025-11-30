@@ -1,5 +1,6 @@
 //Flocking code from: https://p5js.org/examples/classes-and-objects-flocking/
 //Photo by Logan Voss on Unsplash: https://unsplash.com/photos/the-image-shows-static-noise-on-a-blue-screen-dI8klOtC5Og
+//Trail code from: https://www.youtube.com/watch?v=vqE8DMfOajk
       
 let flock;
 let bg;
@@ -8,12 +9,13 @@ let blurAmount = 0;
 let separateAmount = 25;
 
 function preload(){
+  //the background image
   bg = loadImage("static.jpg");
   
 }
 
 function setup() {
-  createCanvas(1280, 720);
+  createCanvas(1920, 1080);
 
   flock = new Flock();
 
@@ -111,7 +113,7 @@ class Boid {
     this.velocity = createVector(random(-1, 1), random(-1, 1));
     this.position = createVector(x, y);
     this.size = 5.0;
-
+    this.history = [];
     // Maximum speed
     this.maxSpeed = 3;
 
@@ -119,6 +121,7 @@ class Boid {
     this.maxForce = 0.05;
     colorMode(HSB);
     this.color = color(255);
+    
   }
 
   run(boids) {
@@ -161,8 +164,21 @@ class Boid {
 
     // Reset acceleration to 0 each cycle
     this.acceleration.mult(0);
+    
+    //creating the dot trail
+    var v = createVector(this.position.x, this.position.y)
+    if (this.position.x % 10 <= 1 && this.position.y % 10 <= 1){
+    this.history.push(v)
+    }
+    noStroke();
+    fill(0);
+    
+    for (var i=0; i < this.history.length; i++){
+      var pos = this.history[i];
+      ellipse(pos.x, pos.y, 5);
+    }
   }
-
+  
   // A method that calculates and applies a steering force towards a target
   // STEER = DESIRED MINUS VELOCITY
   seek(target) {
@@ -183,6 +199,8 @@ class Boid {
 
   render() {
     // Draw a triangle rotated in the direction of velocity
+    
+    //this is the cursor shape
     let theta = this.velocity.heading() + radians(90);
     fill(this.color);
     stroke(0);
@@ -200,19 +218,19 @@ class Boid {
   // Wraparound
   borders() {
     if (this.position.x < -this.size) {
-      this.position.x = width + this.size;
+      this.velocity = createVector(random(0,1), random(-1, 1));
     }
 
     if (this.position.y < -this.size) {
-      this.position.y = height + this.size;
+      this.velocity = createVector(random(-1, 1), random(0, 1));
     }
 
     if (this.position.x > width + this.size) {
-      this.position.x = -this.size;
+      this.velocity = createVector(random(-1, 0), random(-1, 1));
     }
 
     if (this.position.y > height + this.size) {
-      this.position.y = -this.size;
+      this.velocity = createVector(random(-1, 1), random(-1, 0));
     }
   }
 
