@@ -6,21 +6,25 @@ let flock;
 let bg;
 let colorAmount = 0;
 let blurAmount = 0;
-let separateAmount = 25;
+let separateAmount = 35;
+let birdImg;
 
 function preload(){
   //the background image
   bg = loadImage("static.jpg");
   
+  // the bird image
+  birdImg = loadImage("bird_image.png");
 }
 
 function setup() {
-  createCanvas(1920, 1080);
+  //createCanvas(1920, 1080);
+  createCanvas(1280, 720);
 
   flock = new Flock();
 
   // Add an initial set of boids into the system (50)
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 20; i++) {
     let b = new Boid(width / 2, height / 2);
     flock.addBoid(b);
   }
@@ -30,6 +34,7 @@ function setup() {
 function draw() {
   background(0);
   image(bg, 0, 0, width, height);
+  
   colorMode(HSB, 255)
   tint(colorAmount, 100, 255);
   filter(BLUR, blurAmount/10)
@@ -166,16 +171,36 @@ class Boid {
     this.acceleration.mult(0);
     
     //creating the dot trail
+    
     var v = createVector(this.position.x, this.position.y)
     if (this.position.x % 10 <= 1 && this.position.y % 10 <= 1){
     this.history.push(v)
     }
     noStroke();
-    fill(0);
-    
+    fill(255);
     for (var i=0; i < this.history.length; i++){
       var pos = this.history[i];
-      ellipse(pos.x, pos.y, 5);
+      push();
+      translate(pos.x, pos.y);
+      //options
+      //drawStar(0, 0, 1, 3, 5); // x, y, innerRadius, outerRadius, points
+      drawStar(0, 0, 0.5, 2, 5); // x, y, innerRadius, outerRadius, points
+      
+      pop();
+    }
+    function drawStar(x, y, radius1, radius2, npoints) {
+      let angle = TWO_PI / npoints;
+      let halfAngle = angle / 2.0;
+      beginShape();
+      for (let a = 0; a < TWO_PI; a += angle) {
+        let sx = x + cos(a) * radius2;
+        let sy = y + sin(a) * radius2;
+        vertex(sx, sy);
+        sx = x + cos(a + halfAngle) * radius1;
+        sy = y + sin(a + halfAngle) * radius1;
+        vertex(sx, sy);
+      }
+      endShape(CLOSE);
     }
   }
   
@@ -202,16 +227,24 @@ class Boid {
     
     //this is the cursor shape
     let theta = this.velocity.heading() + radians(90);
-    fill(this.color);
-    stroke(0);
+    //fill(this.color);
+    //stroke(0);
+    //push();
+    //translate(this.position.x, this.position.y);
+    //rotate(theta);
+    //beginShape();
+    //vertex(0, -this.size * 2);
+    //vertex(-this.size, this.size * 2);
+    //vertex(this.size, this.size * 2);
+    //endShape(CLOSE);
+    //pop();
+    
     push();
     translate(this.position.x, this.position.y);
     rotate(theta);
-    beginShape();
-    vertex(0, -this.size * 2);
-    vertex(-this.size, this.size * 2);
-    vertex(this.size, this.size * 2);
-    endShape(CLOSE);
+    // Draw the image centered on the boid
+    imageMode(CENTER);
+    image(birdImg, 0, 0, this.size * 9, this.size * 9); // adjust size multiplier as needed
     pop();
   }
 
@@ -322,3 +355,4 @@ class Boid {
     }
   }
 } // class Boid
+
